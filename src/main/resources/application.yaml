@@ -26,6 +26,12 @@ request-signature-ceph:
   access-key: ${REQUEST_SIGNATURE_CEPH_ACCESS_KEY}
   secret-key: ${REQUEST_SIGNATURE_CEPH_SECRET_KEY}
 
+historic-signature-ceph:
+  http-endpoint: ${HISTORIC_SIGNATURES_CEPH_HTTP_ENDPOINT}
+  bucket: ${HISTORIC_SIGNATURES_CEPH_BUCKET_NAME}
+  access-key: ${HISTORIC_SIGNATURES_CEPH_ACCESS_KEY}
+  secret-key: ${HISTORIC_SIGNATURES_CEPH_SECRET_KEY}
+
 openshift:
   enabled: true
   namespace: ${OPENSHIFT_NAMESPACE}

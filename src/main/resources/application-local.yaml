@@ -17,6 +17,12 @@ request-signature-ceph:
   secret-key: secret-key
   bucket: bucket
 
+historic-signature-ceph:
+  http-endpoint: https://s3-openshift-storage.apps.cicd2.mdtu-ddm.projects.epam.com
+  access-key: access-key
+  secret-key: secret-key
+  bucket: bucket
+
 openshift:
   enabled: false
   namespace: namespace

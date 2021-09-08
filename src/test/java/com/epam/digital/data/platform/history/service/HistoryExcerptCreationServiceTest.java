@@ -1,21 +1,5 @@
 package com.epam.digital.data.platform.history.service;
 
-import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
-import com.epam.digital.data.platform.excerpt.model.ExcerptProcessingStatus;
-import com.epam.digital.data.platform.excerpt.model.StatusDto;
-import com.epam.digital.data.platform.history.exception.HistoryExcerptGenerationException;
-import com.epam.digital.data.platform.history.model.HistoryExcerptData;
-import com.epam.digital.data.platform.history.repository.HistoryDataRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Map;
-import java.util.UUID;
-
 import static com.epam.digital.data.platform.history.util.HistoryExcerptUtil.EXCERPT_TYPE;
 import static com.epam.digital.data.platform.history.util.HistoryExcerptUtil.INPUT_DATA_FIELD;
 import static com.epam.digital.data.platform.history.util.HistoryExcerptUtil.INPUT_ENTITY_ID_FIELD;
@@ -25,6 +9,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
+import com.epam.digital.data.platform.excerpt.model.ExcerptProcessingStatus;
+import com.epam.digital.data.platform.excerpt.model.StatusDto;
+import com.epam.digital.data.platform.history.exception.HistoryExcerptGenerationException;
+import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.repository.HistoryDataRepository;
+import java.util.Map;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class HistoryExcerptCreationServiceTest {
@@ -45,6 +44,8 @@ class HistoryExcerptCreationServiceTest {
   private ExcerptUrlProvider excerptUrlProvider;
   @Mock
   private OpenShiftService openShiftService;
+  @Mock
+  private UserInfoEnricher userInfoEnricher;
 
   private final HistoryExcerptData mockData = new HistoryExcerptData();
 
@@ -53,13 +54,13 @@ class HistoryExcerptCreationServiceTest {
     when(historyDataRepository.getHistoryData(TABLE_NAME, ENTITY_ID))
             .thenReturn(mockData);
     when(excerptService.generate(any()))
-            .thenReturn(EXCERPT_ID);
+        .thenReturn(EXCERPT_ID);
     when(excerptService.getFinalProcessingStatus(EXCERPT_ID))
         .thenReturn(new StatusDto(ExcerptProcessingStatus.COMPLETED, ""));
 
     historyExcerptCreationService =
-        new HistoryExcerptCreationService(
-                historyDataRepository, excerptService, excerptUrlProvider, openShiftService);
+        new HistoryExcerptCreationService(historyDataRepository, excerptService,
+            excerptUrlProvider, openShiftService, userInfoEnricher);
   }
 
   @Test
@@ -75,8 +76,8 @@ class HistoryExcerptCreationServiceTest {
     expectedExcerptEvent.setExcerptType(EXCERPT_TYPE);
     expectedExcerptEvent.setExcerptInputData(Map.of(
             INPUT_TABLE_NAME_FIELD, TABLE_NAME,
-            INPUT_ENTITY_ID_FIELD, ENTITY_ID,
-            INPUT_DATA_FIELD, mockData
+        INPUT_ENTITY_ID_FIELD, ENTITY_ID,
+        INPUT_DATA_FIELD, mockData
     ));
     expectedExcerptEvent.setRequiresSystemSignature(false);
 

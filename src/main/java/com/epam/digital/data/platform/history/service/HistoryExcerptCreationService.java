@@ -28,20 +28,24 @@ public class HistoryExcerptCreationService {
   private final ExcerptService excerptService;
   private final ExcerptUrlProvider excerptUrlProvider;
   private final OpenShiftService openShiftService;
+  private final UserInfoEnricher userInfoEnricher;
 
   public HistoryExcerptCreationService(
       HistoryDataRepository historyDataRepository,
       ExcerptService excerptService,
       ExcerptUrlProvider excerptUrlProvider,
-      OpenShiftService openShiftService) {
+      OpenShiftService openShiftService,
+      UserInfoEnricher userInfoEnricher) {
     this.historyDataRepository = historyDataRepository;
     this.excerptService = excerptService;
     this.excerptUrlProvider = excerptUrlProvider;
     this.openShiftService = openShiftService;
+    this.userInfoEnricher = userInfoEnricher;
   }
 
   public void createExcerpt(String tableName, UUID id) throws InterruptedException {
     var historyData = historyDataRepository.getHistoryData(tableName, id);
+    userInfoEnricher.enrichWithUserInfo(historyData);
 
     var excerptEvent = createExcerptEvent(tableName, id, historyData);
     var excerptId = excerptService.generate(excerptEvent);

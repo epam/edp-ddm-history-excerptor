@@ -4,6 +4,7 @@ import com.epam.digital.data.platform.history.config.DataSourceEnable;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
 import com.epam.digital.data.platform.history.model.HistoryExcerptRow;
 import com.epam.digital.data.platform.history.model.HistoryExcerptRowDdmInfo;
+import com.epam.digital.data.platform.history.service.UserInfoEnricher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,11 +13,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataSourceEnable
 @SpringBootTest(classes = { HistoryTableSelectRepository.class })
+@MockBean(UserInfoEnricher.class)
 class HistoryTableSelectRepositoryIT {
 
   @Autowired
