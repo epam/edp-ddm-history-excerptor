@@ -5,14 +5,14 @@ import java.util.Map;
 public class HistoryExcerptRow {
 
   private HistoryExcerptRowDdmInfo ddmInfo;
-  private Map<String, String> operationalTableData;
+  private Map<String, OperationalTableField> operationalTableData;
   private UserInfo userInfo;
 
   public HistoryExcerptRow() {
   }
 
-  public HistoryExcerptRow(HistoryExcerptRowDdmInfo ddmInfo,
-      Map<String, String> operationalTableData) {
+  public HistoryExcerptRow(
+          HistoryExcerptRowDdmInfo ddmInfo, Map<String, OperationalTableField> operationalTableData) {
     this.ddmInfo = ddmInfo;
     this.operationalTableData = operationalTableData;
   }
@@ -25,11 +25,11 @@ public class HistoryExcerptRow {
     this.ddmInfo = ddmInfo;
   }
 
-  public Map<String, String> getOperationalTableData() {
+  public Map<String, OperationalTableField> getOperationalTableData() {
     return operationalTableData;
   }
 
-  public void setOperationalTableData(Map<String, String> operationalTableData) {
+  public void setOperationalTableData(Map<String, OperationalTableField> operationalTableData) {
     this.operationalTableData = operationalTableData;
   }
 

@@ -3,6 +3,8 @@ package com.epam.digital.data.platform.history.repository;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
 import com.epam.digital.data.platform.history.model.HistoryExcerptRowDdmInfo;
 import com.epam.digital.data.platform.history.model.HistoryExcerptRow;
+import com.epam.digital.data.platform.history.model.OperationalTableField;
+import com.epam.digital.data.platform.history.util.DateUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
@@ -13,10 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.epam.digital.data.platform.history.util.OperationalTableFieldResolvingUtil.resolveOperationalFieldValue;
 import static com.epam.digital.data.platform.history.util.HistoryTableUtil.DDM_APPLICATION_ID_COLUMN;
 import static com.epam.digital.data.platform.history.util.HistoryTableUtil.DDM_BUSINESS_ACTIVITY_COLUMN;
 import static com.epam.digital.data.platform.history.util.HistoryTableUtil.DDM_BUSINESS_ACTIVITY_INSTANCE_ID_COLUMN;
@@ -36,7 +41,8 @@ import static com.epam.digital.data.platform.history.util.HistoryTableUtil.DDM_S
 @Repository
 public class HistoryTableSelectRepository {
 
-  private static final String SQL_HISTORY_REQUEST_PATTERN = "select * from %s where %s='%s'";
+  private static final String SQL_HISTORY_REQUEST_PATTERN =
+      "select * from %s where %s='%s' order by ddm_created_at desc";
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -78,7 +84,11 @@ public class HistoryTableSelectRepository {
 
   private HistoryExcerptRowDdmInfo getDdmInfo(ResultSet resultSet) throws SQLException {
     var ddmInfo = new HistoryExcerptRowDdmInfo();
-    ddmInfo.setCreatedAt(resultSet.getString(DDM_CREATED_AT_COLUMN));
+    ddmInfo.setCreatedAt(
+        Optional.ofNullable(resultSet.getTimestamp(DDM_CREATED_AT_COLUMN))
+            .map(DateUtils::getDateTimeFromSqlTimestamp)
+            .map(Objects::toString)
+            .orElse(null));
     ddmInfo.setCreatedBy(resultSet.getString(DDM_CREATED_BY_COLUMN));
     ddmInfo.setDmlOp(resultSet.getString(DDM_DML_OP_COLUMN));
     ddmInfo.setSystemId(resultSet.getString(DDM_SYSTEM_ID_COLUMN));
@@ -99,11 +109,12 @@ public class HistoryTableSelectRepository {
     return ddmInfo;
   }
 
-  private Map<String, String> getOperationalTableData(
+  private Map<String, OperationalTableField> getOperationalTableData(
       ResultSet resultSet, List<String> operationalTableColumns) throws SQLException {
-    var operationTableData = new HashMap<String, String>();
+    var operationTableData = new HashMap<String, OperationalTableField>();
     for (String columnName : operationalTableColumns) {
-      operationTableData.put(columnName, resultSet.getString(columnName));
+      var sqlColumnValue = resultSet.getObject(columnName);
+      operationTableData.put(columnName, resolveOperationalFieldValue(sqlColumnValue));
     }
     return operationTableData;
   }
