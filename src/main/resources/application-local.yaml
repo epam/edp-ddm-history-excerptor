@@ -4,9 +4,11 @@ spring:
     username: postgres
     password: qwerty
 
+thirdPartySystems:
+  accessToken: token
+
 excerpt:
   url: localhost:7001
-  accessToken: token
 
 dso:
   url: https://dig-sign-ops-data-paradise-dev.apps.cicd2.mdtu-ddm.projects.epam.com

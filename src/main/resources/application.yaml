@@ -11,9 +11,11 @@ schema:
   name: public
   historyTableSuffix: _hst
 
+thirdPartySystems:
+  accessToken: ${ACCESS_TOKEN}
+
 excerpt:
   url: ${EXCERPT_URL}
-  accessToken: ${EXCERPT_TOKEN}
   statusCheck:
     maxAttempts: 10
 

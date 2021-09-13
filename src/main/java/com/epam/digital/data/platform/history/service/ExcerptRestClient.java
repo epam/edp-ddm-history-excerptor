@@ -22,5 +22,5 @@ public interface ExcerptRestClient {
       @RequestHeader Map<String, Object> headers);
 
   @GetMapping("/{id}/status")
-  StatusDto status(@PathVariable("id") UUID id, @RequestHeader Map<String, Object> headers);
+  StatusDto status(@PathVariable("id") UUID id);
 }

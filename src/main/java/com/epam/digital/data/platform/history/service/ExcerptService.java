@@ -4,7 +4,7 @@ import com.epam.digital.data.platform.excerpt.model.ExcerptEventDto;
 import com.epam.digital.data.platform.excerpt.model.ExcerptProcessingStatus;
 import com.epam.digital.data.platform.excerpt.model.StatusDto;
 import com.epam.digital.data.platform.history.exception.HistoryExcerptGenerationException;
-import com.epam.digital.data.platform.history.util.ExcerptHeader;
+import com.epam.digital.data.platform.history.util.ThirdPartyHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,6 @@ public class ExcerptService {
 
   private static final long EXCERPT_STATUS_CHECK_TIMEOUT = 5;
 
-  private final String excerptAccessToken;
   private final int excerptStatusCheckMaxAttempts;
 
   private final Logger log = LoggerFactory.getLogger(ExcerptService.class);
@@ -29,12 +28,10 @@ public class ExcerptService {
   private final ThreadSleepService threadSleepService;
 
   public ExcerptService(
-      @Value("${excerpt.accessToken}") String excerptAccessToken,
       @Value("${excerpt.statusCheck.maxAttempts}") int excerptStatusCheckMaxAttempts,
       ExcerptRestClient excerptRestClient,
       DigitalSignatureService digitalSignatureService,
       ThreadSleepService threadSleepService) {
-    this.excerptAccessToken = excerptAccessToken;
     this.excerptStatusCheckMaxAttempts = excerptStatusCheckMaxAttempts;
     this.excerptRestClient = excerptRestClient;
     this.digitalSignatureService = digitalSignatureService;
@@ -70,16 +67,15 @@ public class ExcerptService {
 
   private Map<String, Object> createExcerptRequestHeaders(String derivedSignatureCephKey) {
     Map<String, Object> excerptGenerateHeaders = new HashMap<>();
-    excerptGenerateHeaders.put(ExcerptHeader.ACCESS_TOKEN.getHeaderName(), excerptAccessToken);
-    excerptGenerateHeaders.put(ExcerptHeader.X_DIGITAL_SIGNATURE.getHeaderName(), derivedSignatureCephKey);
     excerptGenerateHeaders.put(
-            ExcerptHeader.X_DIGITAL_SIGNATURE_DERIVED.getHeaderName(), derivedSignatureCephKey);
+        ThirdPartyHeader.X_DIGITAL_SIGNATURE.getHeaderName(), derivedSignatureCephKey);
+    excerptGenerateHeaders.put(
+        ThirdPartyHeader.X_DIGITAL_SIGNATURE_DERIVED.getHeaderName(), derivedSignatureCephKey);
     return excerptGenerateHeaders;
   }
 
   private StatusDto getCurrentExcerptStatus(UUID excerptId) {
-    var excerptStatusDto = excerptRestClient.status(
-            excerptId, Map.of(ExcerptHeader.ACCESS_TOKEN.getHeaderName(), excerptAccessToken));
+    var excerptStatusDto = excerptRestClient.status(excerptId);
     log.info("Current excerpt status: {}", excerptStatusDto.getStatus());
     return excerptStatusDto;
   }
