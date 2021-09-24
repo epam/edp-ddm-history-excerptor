@@ -6,11 +6,14 @@ import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.function.Supplier;
+
 @Configuration
 public class OpenShiftConfiguration {
 
   @Bean
-  public KubernetesClient openShiftClient(OpenshiftProperties openshiftProperties) {
-    return new DefaultOpenShiftClient().inNamespace(openshiftProperties.getNamespace());
+  public Supplier<KubernetesClient> kubernetesClientFactory(
+      OpenshiftProperties openshiftProperties) {
+    return () -> new DefaultOpenShiftClient().inNamespace(openshiftProperties.getNamespace());
   }
 }

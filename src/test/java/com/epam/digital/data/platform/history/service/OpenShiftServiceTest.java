@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.function.Supplier;
+
 import static com.epam.digital.data.platform.history.config.properties.OpenshiftProperties.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,9 +35,12 @@ class OpenShiftServiceTest {
   @Mock
   private KubernetesClient kubernetesClient;
 
+  private Supplier<KubernetesClient> kubernetesClientFactory;
+
   @BeforeEach
   void beforeEach() {
-    openShiftService = new OpenShiftService(openshiftProperties, kubernetesClient);
+    kubernetesClientFactory = () -> kubernetesClient;
+    openShiftService = new OpenShiftService(openshiftProperties, kubernetesClientFactory);
   }
 
   @Test
