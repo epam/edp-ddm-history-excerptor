@@ -33,7 +33,7 @@ class UserInfoEnricherTest {
   private static final String HISTORIC_BUCKET = "bucket";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  private static final String DATA = "\"test_data\"";
+  private static final String DATA = "{\"data\":\"test_data\"}";
   private static final String SIGNATURE = "test_signature";
   private static final String CEPH_KEY = "ceph_key";
   private static final String CEPH_VALUE =

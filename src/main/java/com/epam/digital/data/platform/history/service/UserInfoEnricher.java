@@ -8,11 +8,11 @@ import com.epam.digital.data.platform.dso.client.exception.InternalServerErrorEx
 import com.epam.digital.data.platform.dso.client.exception.SignatureValidationException;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
 import com.epam.digital.data.platform.history.model.UserInfo;
+import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +51,7 @@ public class UserInfoEnricher {
   }
 
   private UserInfo getUserInfo(String key) {
-    if(key == null) {
+    if (key == null) {
       log.error("Signature not saved. Key == null");
       return EMPTY_USER_INFO;
     }
@@ -64,9 +64,9 @@ public class UserInfoEnricher {
     String signature;
     String data;
     try {
-      var contentMap = objectMapper.readValue(content.get(), Map.class);
-      data = objectMapper.writeValueAsString(contentMap.get(DATA));
-      signature = (String) contentMap.get(SIGNATURE);
+      var formDataDto = objectMapper.readValue(content.get(), FormDataDto.class);
+      data = objectMapper.writeValueAsString(formDataDto.getData());
+      signature = formDataDto.getSignature();
     } catch (JsonProcessingException e) {
       throw new RuntimeJsonMappingException(e.getMessage());
     }
