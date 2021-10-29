@@ -15,6 +15,7 @@ import com.epam.digital.data.platform.excerpt.model.ExcerptProcessingStatus;
 import com.epam.digital.data.platform.excerpt.model.StatusDto;
 import com.epam.digital.data.platform.history.exception.HistoryExcerptGenerationException;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.model.HistoryTableData;
 import com.epam.digital.data.platform.history.repository.HistoryDataRepository;
 import java.util.Map;
 import java.util.UUID;
@@ -39,28 +40,35 @@ class HistoryExcerptCreationServiceTest {
   @Mock
   private HistoryDataRepository historyDataRepository;
   @Mock
+  private HistoryTableToExcerptConverter historyTableToExcerptConverter;
+  @Mock
   private ExcerptService excerptService;
   @Mock
   private ExcerptUrlProvider excerptUrlProvider;
   @Mock
   private OpenShiftService openShiftService;
-  @Mock
-  private UserInfoEnricher userInfoEnricher;
 
-  private final HistoryExcerptData mockData = new HistoryExcerptData();
+  private final HistoryTableData mockTableData = new HistoryTableData();
+  private final HistoryExcerptData mockExcerptData = new HistoryExcerptData();
 
   @BeforeEach
   void beforeEach() throws InterruptedException {
     when(historyDataRepository.getHistoryData(TABLE_NAME, ENTITY_ID))
-            .thenReturn(mockData);
+            .thenReturn(mockTableData);
+    when(historyTableToExcerptConverter.convert(mockTableData))
+            .thenReturn(mockExcerptData);
     when(excerptService.generate(any()))
         .thenReturn(EXCERPT_ID);
     when(excerptService.getFinalProcessingStatus(EXCERPT_ID))
         .thenReturn(new StatusDto(ExcerptProcessingStatus.COMPLETED, ""));
 
     historyExcerptCreationService =
-        new HistoryExcerptCreationService(historyDataRepository, excerptService,
-            excerptUrlProvider, openShiftService, userInfoEnricher);
+        new HistoryExcerptCreationService(
+            historyDataRepository,
+            historyTableToExcerptConverter,
+            excerptService,
+            excerptUrlProvider,
+            openShiftService);
   }
 
   @Test
@@ -74,11 +82,14 @@ class HistoryExcerptCreationServiceTest {
 
     var expectedExcerptEvent = new ExcerptEventDto();
     expectedExcerptEvent.setExcerptType(EXCERPT_TYPE);
-    expectedExcerptEvent.setExcerptInputData(Map.of(
-            INPUT_TABLE_NAME_FIELD, TABLE_NAME,
-        INPUT_ENTITY_ID_FIELD, ENTITY_ID,
-        INPUT_DATA_FIELD, mockData
-    ));
+    expectedExcerptEvent.setExcerptInputData(
+        Map.of(
+            INPUT_TABLE_NAME_FIELD,
+            TABLE_NAME,
+            INPUT_ENTITY_ID_FIELD,
+            ENTITY_ID,
+            INPUT_DATA_FIELD,
+            mockExcerptData));
     expectedExcerptEvent.setRequiresSystemSignature(false);
 
     assertThat(actualExcerptEvent).usingRecursiveComparison().isEqualTo(expectedExcerptEvent);

@@ -5,6 +5,7 @@ import com.epam.digital.data.platform.excerpt.model.ExcerptProcessingStatus;
 import com.epam.digital.data.platform.excerpt.model.StatusDto;
 import com.epam.digital.data.platform.history.exception.HistoryExcerptGenerationException;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.model.HistoryTableData;
 import com.epam.digital.data.platform.history.repository.HistoryDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,29 +26,29 @@ public class HistoryExcerptCreationService {
   private final Logger log = LoggerFactory.getLogger(HistoryExcerptCreationService.class);
 
   private final HistoryDataRepository historyDataRepository;
+  private final HistoryTableToExcerptConverter historyTableToExcerptConverter;
   private final ExcerptService excerptService;
   private final ExcerptUrlProvider excerptUrlProvider;
   private final OpenShiftService openShiftService;
-  private final UserInfoEnricher userInfoEnricher;
 
   public HistoryExcerptCreationService(
       HistoryDataRepository historyDataRepository,
+      HistoryTableToExcerptConverter historyTableToExcerptConverter,
       ExcerptService excerptService,
       ExcerptUrlProvider excerptUrlProvider,
-      OpenShiftService openShiftService,
-      UserInfoEnricher userInfoEnricher) {
+      OpenShiftService openShiftService) {
     this.historyDataRepository = historyDataRepository;
+    this.historyTableToExcerptConverter = historyTableToExcerptConverter;
     this.excerptService = excerptService;
     this.excerptUrlProvider = excerptUrlProvider;
     this.openShiftService = openShiftService;
-    this.userInfoEnricher = userInfoEnricher;
   }
 
   public void createExcerpt(String tableName, UUID id) throws InterruptedException {
-    var historyData = historyDataRepository.getHistoryData(tableName, id);
-    userInfoEnricher.enrichWithUserInfo(historyData);
+    HistoryTableData historyTableData = historyDataRepository.getHistoryData(tableName, id);
+    HistoryExcerptData excerptData = historyTableToExcerptConverter.convert(historyTableData);
 
-    var excerptEvent = createExcerptEvent(tableName, id, historyData);
+    var excerptEvent = createExcerptEvent(tableName, id, excerptData);
     var excerptId = excerptService.generate(excerptEvent);
 
     StatusDto excerptStatus = excerptService.getFinalProcessingStatus(excerptId);

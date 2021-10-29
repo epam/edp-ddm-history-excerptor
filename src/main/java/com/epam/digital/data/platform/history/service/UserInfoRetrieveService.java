@@ -6,7 +6,7 @@ import com.epam.digital.data.platform.dso.client.DigitalSignatureRestClient;
 import com.epam.digital.data.platform.dso.client.exception.BadRequestException;
 import com.epam.digital.data.platform.dso.client.exception.InternalServerErrorException;
 import com.epam.digital.data.platform.dso.client.exception.SignatureValidationException;
-import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.model.HistoryTableRowDdmInfo;
 import com.epam.digital.data.platform.history.model.UserInfo;
 import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
@@ -19,20 +19,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserInfoEnricher {
+public class UserInfoRetrieveService {
 
   private static final UserInfo EMPTY_USER_INFO = new UserInfo();
-  private static final String SIGNATURE = "signature";
-  private static final String DATA = "data";
 
-  private final Logger log = LoggerFactory.getLogger(UserInfoEnricher.class);
+  private final Logger log = LoggerFactory.getLogger(UserInfoRetrieveService.class);
 
   private final String historicSignatureBucket;
   private final ObjectMapper objectMapper;
   private final DigitalSignatureRestClient digitalSignatureRestClient;
   private final CephService historicSignatureCephService;
 
-  public UserInfoEnricher(
+  public UserInfoRetrieveService(
       @Value("${historic-signature-ceph.bucket}") String historicSignatureBucket,
       ObjectMapper objectMapper,
       DigitalSignatureRestClient digitalSignatureRestClient,
@@ -43,14 +41,8 @@ public class UserInfoEnricher {
     this.historicSignatureCephService = historicSignatureCephService;
   }
 
-  public void enrichWithUserInfo(HistoryExcerptData historyData) {
-    for (var row : historyData.getExcerptRows()) {
-      var cephKey = row.getDdmInfo().getDigitalSign();
-      row.setUserInfo(getUserInfo(cephKey));
-    }
-  }
-
-  private UserInfo getUserInfo(String key) {
+  public UserInfo getUserInfo(HistoryTableRowDdmInfo tableDdmInfo) {
+    var key = tableDdmInfo.getDigitalSign();
     if (key == null) {
       log.error("Signature not saved. Key == null");
       return EMPTY_USER_INFO;

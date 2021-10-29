@@ -1,7 +1,7 @@
 package com.epam.digital.data.platform.history.repository;
 
 import com.epam.digital.data.platform.history.config.properties.SchemaProperties;
-import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.model.HistoryTableData;
 import org.springframework.stereotype.Component;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Schema;
@@ -32,7 +32,7 @@ public class HistoryDataRepository {
     this.historyTableSelectRepository = historyTableSelectRepository;
   }
 
-  public HistoryExcerptData getHistoryData(String tableName, UUID id) {
+  public HistoryTableData getHistoryData(String tableName, UUID id) {
     var idColumnName = getPkColumnName(tableName);
     var historicalTableName = tableName + schemaProperties.getHistoryTableSuffix();
     validateHistoricalTable(historicalTableName, idColumnName);

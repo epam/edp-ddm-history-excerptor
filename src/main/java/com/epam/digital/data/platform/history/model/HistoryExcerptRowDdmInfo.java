@@ -4,17 +4,10 @@ public class HistoryExcerptRowDdmInfo {
   private String createdAt;
   private String createdBy;
   private String dmlOp;
-  private String systemId;
-  private String applicationId;
+  private String system;
+  private String application;
   private String businessProcessId;
-  private String businessProcessDefinitionId;
-  private String businessProcessInstanceId;
   private String businessActivity;
-  private String businessActivityInstanceId;
-  private String digitalSign;
-  private String digitalSignDerived;
-  private String digitalSignChecksum;
-  private String digitalSignDerivedChecksum;
 
   public String getCreatedAt() {
     return createdAt;
@@ -40,20 +33,20 @@ public class HistoryExcerptRowDdmInfo {
     this.dmlOp = dmlOp;
   }
 
-  public String getSystemId() {
-    return systemId;
+  public String getSystem() {
+    return system;
   }
 
-  public void setSystemId(String systemId) {
-    this.systemId = systemId;
+  public void setSystem(String system) {
+    this.system = system;
   }
 
-  public String getApplicationId() {
-    return applicationId;
+  public String getApplication() {
+    return application;
   }
 
-  public void setApplicationId(String applicationId) {
-    this.applicationId = applicationId;
+  public void setApplication(String application) {
+    this.application = application;
   }
 
   public String getBusinessProcessId() {
@@ -64,67 +57,11 @@ public class HistoryExcerptRowDdmInfo {
     this.businessProcessId = businessProcessId;
   }
 
-  public String getBusinessProcessDefinitionId() {
-    return businessProcessDefinitionId;
-  }
-
-  public void setBusinessProcessDefinitionId(String businessProcessDefinitionId) {
-    this.businessProcessDefinitionId = businessProcessDefinitionId;
-  }
-
-  public String getBusinessProcessInstanceId() {
-    return businessProcessInstanceId;
-  }
-
-  public void setBusinessProcessInstanceId(String businessProcessInstanceId) {
-    this.businessProcessInstanceId = businessProcessInstanceId;
-  }
-
   public String getBusinessActivity() {
     return businessActivity;
   }
 
   public void setBusinessActivity(String businessActivity) {
     this.businessActivity = businessActivity;
-  }
-
-  public String getBusinessActivityInstanceId() {
-    return businessActivityInstanceId;
-  }
-
-  public void setBusinessActivityInstanceId(String businessActivityInstanceId) {
-    this.businessActivityInstanceId = businessActivityInstanceId;
-  }
-
-  public String getDigitalSign() {
-    return digitalSign;
-  }
-
-  public void setDigitalSign(String digitalSign) {
-    this.digitalSign = digitalSign;
-  }
-
-  public String getDigitalSignDerived() {
-    return digitalSignDerived;
-  }
-
-  public void setDigitalSignDerived(String digitalSignDerived) {
-    this.digitalSignDerived = digitalSignDerived;
-  }
-
-  public String getDigitalSignChecksum() {
-    return digitalSignChecksum;
-  }
-
-  public void setDigitalSignChecksum(String digitalSignChecksum) {
-    this.digitalSignChecksum = digitalSignChecksum;
-  }
-
-  public String getDigitalSignDerivedChecksum() {
-    return digitalSignDerivedChecksum;
-  }
-
-  public void setDigitalSignDerivedChecksum(String digitalSignDerivedChecksum) {
-    this.digitalSignDerivedChecksum = digitalSignDerivedChecksum;
   }
 }

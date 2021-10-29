@@ -1,8 +1,8 @@
 package com.epam.digital.data.platform.history.repository;
 
-import com.epam.digital.data.platform.history.model.HistoryExcerptData;
-import com.epam.digital.data.platform.history.model.HistoryExcerptRowDdmInfo;
-import com.epam.digital.data.platform.history.model.HistoryExcerptRow;
+import com.epam.digital.data.platform.history.model.HistoryTableData;
+import com.epam.digital.data.platform.history.model.HistoryTableRow;
+import com.epam.digital.data.platform.history.model.HistoryTableRowDdmInfo;
 import com.epam.digital.data.platform.history.model.OperationalTableField;
 import com.epam.digital.data.platform.history.util.DateUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -50,23 +49,23 @@ public class HistoryTableSelectRepository {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  HistoryExcerptData getHistoryData(String tableName, String searchColumn, UUID id) {
+  HistoryTableData getHistoryData(String tableName, String searchColumn, UUID id) {
     var sql = String.format(SQL_HISTORY_REQUEST_PATTERN, tableName, searchColumn, id);
-    var historyExcerptExtractor = getHistoryExcerptExtractor();
+    var historyExcerptExtractor = getHistoryDataExtractor();
     return jdbcTemplate.query(sql, historyExcerptExtractor);
   }
 
-  private ResultSetExtractor<HistoryExcerptData> getHistoryExcerptExtractor() {
+  private ResultSetExtractor<HistoryTableData> getHistoryDataExtractor() {
     return resultSet -> {
       var operationalTableColumns = getOperationalTableColumns(resultSet);
-      var historyExcerptRows = new ArrayList<HistoryExcerptRow>();
+      var historyExcerptRows = new ArrayList<HistoryTableRow>();
       while (resultSet.next()) {
         var ddmInfo = getDdmInfo(resultSet);
         var operationalTableData = getOperationalTableData(resultSet, operationalTableColumns);
-        var historyExcerptRow = new HistoryExcerptRow(ddmInfo, operationalTableData);
+        var historyExcerptRow = new HistoryTableRow(ddmInfo, operationalTableData);
         historyExcerptRows.add(historyExcerptRow);
       }
-      return new HistoryExcerptData(operationalTableColumns, historyExcerptRows);
+      return new HistoryTableData(operationalTableColumns, historyExcerptRows);
     };
   }
 
@@ -82,22 +81,21 @@ public class HistoryTableSelectRepository {
         .collect(Collectors.toList());
   }
 
-  private HistoryExcerptRowDdmInfo getDdmInfo(ResultSet resultSet) throws SQLException {
-    var ddmInfo = new HistoryExcerptRowDdmInfo();
+  private HistoryTableRowDdmInfo getDdmInfo(ResultSet resultSet) throws SQLException {
+    var ddmInfo = new HistoryTableRowDdmInfo();
     ddmInfo.setCreatedAt(
         Optional.ofNullable(resultSet.getTimestamp(DDM_CREATED_AT_COLUMN))
             .map(DateUtils::getDateTimeFromSqlTimestamp)
-            .map(Objects::toString)
             .orElse(null));
     ddmInfo.setCreatedBy(resultSet.getString(DDM_CREATED_BY_COLUMN));
     ddmInfo.setDmlOp(resultSet.getString(DDM_DML_OP_COLUMN));
-    ddmInfo.setSystemId(resultSet.getString(DDM_SYSTEM_ID_COLUMN));
-    ddmInfo.setApplicationId(resultSet.getString(DDM_APPLICATION_ID_COLUMN));
-    ddmInfo.setBusinessProcessId(resultSet.getString(DDM_BUSINESS_PROCESS_ID_COLUMN));
+    ddmInfo.setSystemId(resultSet.getObject(DDM_SYSTEM_ID_COLUMN, UUID.class));
+    ddmInfo.setApplicationId(resultSet.getObject(DDM_APPLICATION_ID_COLUMN, UUID.class));
+    ddmInfo.setBusinessProcessId(resultSet.getObject(DDM_BUSINESS_PROCESS_ID_COLUMN, UUID.class));
     ddmInfo.setBusinessProcessDefinitionId(
         resultSet.getString(DDM_BUSINESS_PROCESS_DEFINITION_ID_COLUMN));
     ddmInfo.setBusinessProcessInstanceId(
-        resultSet.getString(DDM_BUSINESS_PROCESS_INSTANCE_ID_COLUMN));
+        resultSet.getObject(DDM_BUSINESS_PROCESS_INSTANCE_ID_COLUMN, UUID.class));
     ddmInfo.setBusinessActivity(resultSet.getString(DDM_BUSINESS_ACTIVITY_COLUMN));
     ddmInfo.setBusinessActivityInstanceId(
         resultSet.getString(DDM_BUSINESS_ACTIVITY_INSTANCE_ID_COLUMN));

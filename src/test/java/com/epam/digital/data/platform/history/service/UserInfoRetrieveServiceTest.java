@@ -11,13 +11,10 @@ import com.epam.digital.data.platform.dso.client.DigitalSignatureRestClient;
 import com.epam.digital.data.platform.dso.client.exception.BadRequestException;
 import com.epam.digital.data.platform.dso.client.exception.InternalServerErrorException;
 import com.epam.digital.data.platform.dso.client.exception.SignatureValidationException;
-import com.epam.digital.data.platform.history.model.HistoryExcerptData;
-import com.epam.digital.data.platform.history.model.HistoryExcerptRow;
-import com.epam.digital.data.platform.history.model.HistoryExcerptRowDdmInfo;
+import com.epam.digital.data.platform.history.model.HistoryTableRowDdmInfo;
 import com.epam.digital.data.platform.history.model.UserInfo;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class UserInfoEnricherTest {
+class UserInfoRetrieveServiceTest {
 
   private static final UserInfo EMPTY_USER_INFO = new UserInfo();
   private static final ErrorDto ERROR_DTO = new ErrorDto("code", "msg", "local_msg");
@@ -39,8 +36,9 @@ class UserInfoEnricherTest {
   private static final String CEPH_VALUE =
       "{\"data\":" + DATA + ",\"signature\":\"" + SIGNATURE + "\"}";
 
-  private UserInfoEnricher userInfoEnricher;
-  private HistoryExcerptData historyExcerptData;
+  private UserInfoRetrieveService userInfoRetrieveService;
+
+  private HistoryTableRowDdmInfo historyTableRowDdmInfo;
 
   @Mock
   private DigitalSignatureRestClient digitalSignatureRestClient;
@@ -49,14 +47,11 @@ class UserInfoEnricherTest {
 
   @BeforeEach
   void beforeEach() {
-    userInfoEnricher = new UserInfoEnricher(HISTORIC_BUCKET, OBJECT_MAPPER,
+    userInfoRetrieveService = new UserInfoRetrieveService(HISTORIC_BUCKET, OBJECT_MAPPER,
         digitalSignatureRestClient, historicSignatureCephService);
 
-    HistoryExcerptRowDdmInfo ddmInfo = new HistoryExcerptRowDdmInfo();
-    ddmInfo.setDigitalSign(CEPH_KEY);
-
-    historyExcerptData = new HistoryExcerptData(null,
-        List.of(new HistoryExcerptRow(ddmInfo, null)));
+    historyTableRowDdmInfo = new HistoryTableRowDdmInfo();
+    historyTableRowDdmInfo.setDigitalSign(CEPH_KEY);
 
     when(historicSignatureCephService.getContent(HISTORIC_BUCKET, CEPH_KEY))
         .thenReturn(Optional.of(CEPH_VALUE));
@@ -79,9 +74,8 @@ class UserInfoEnricherTest {
     when(digitalSignatureRestClient.getOwnerInfinite(new VerificationRequestDto(SIGNATURE, DATA)))
         .thenReturn(new OwnerResponseDto("name", "drfo", "edrpou"));
 
-    userInfoEnricher.enrichWithUserInfo(historyExcerptData);
+    var userInfo = userInfoRetrieveService.getUserInfo(historyTableRowDdmInfo);
 
-    var userInfo = historyExcerptData.getExcerptRows().get(0).getUserInfo();
     assertThat(userInfo).isEqualTo(new UserInfo("name", "drfo", "edrpou"));
   }
 
@@ -107,10 +101,8 @@ class UserInfoEnricherTest {
   }
 
   private void assertEmptyUserInfo() {
+    var userInfo = userInfoRetrieveService.getUserInfo(historyTableRowDdmInfo);
 
-    userInfoEnricher.enrichWithUserInfo(historyExcerptData);
-
-    var userInfo = historyExcerptData.getExcerptRows().get(0).getUserInfo();
     assertThat(userInfo).isEqualTo(EMPTY_USER_INFO);
   }
 }

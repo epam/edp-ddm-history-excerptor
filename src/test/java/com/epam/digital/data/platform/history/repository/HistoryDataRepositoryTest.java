@@ -2,6 +2,7 @@ package com.epam.digital.data.platform.history.repository;
 
 import com.epam.digital.data.platform.history.config.properties.SchemaProperties;
 import com.epam.digital.data.platform.history.model.HistoryExcerptData;
+import com.epam.digital.data.platform.history.model.HistoryTableData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,12 +71,12 @@ class HistoryDataRepositoryTest {
     when(historicalTable.lookupColumn(ID_COLUMN))
             .thenReturn(Optional.of(historicalTableSearchColumn));
 
-    var mockExcerptData = new HistoryExcerptData();
+    var mockExcerptData = new HistoryTableData();
     when(historyTableSelectRepository.getHistoryData(
             TABLE_NAME + HST_TABLE_SUFFIX, ID_COLUMN, SEARCH_ID))
         .thenReturn(mockExcerptData);
 
-    var actual = historyDataRepository.getHistoryData(TABLE_NAME, SEARCH_ID);
+    HistoryTableData actual = historyDataRepository.getHistoryData(TABLE_NAME, SEARCH_ID);
 
     assertThat(actual).isEqualTo(mockExcerptData);
   }
