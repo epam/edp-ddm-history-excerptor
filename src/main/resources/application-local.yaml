@@ -3,6 +3,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/registry
     username: postgres
     password: qwerty
+    
+schema:
+  name: public
 
 thirdPartySystems:
   accessToken: token

@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 schema:
-  name: public
+  name: ${DB_SCHEMA:registry}
   historyTableSuffix: _hst
 
 thirdPartySystems:
