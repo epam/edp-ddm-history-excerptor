@@ -11,7 +11,7 @@ public class HistoryTableRowDdmInfo {
   private UUID applicationId;
   private UUID businessProcessId;
   private String businessProcessDefinitionId;
-  private UUID businessProcessInstanceId;
+  private String businessProcessInstanceId;
   private String businessActivity;
   private String businessActivityInstanceId;
   private String digitalSign;
@@ -75,11 +75,11 @@ public class HistoryTableRowDdmInfo {
     this.businessProcessDefinitionId = businessProcessDefinitionId;
   }
 
-  public UUID getBusinessProcessInstanceId() {
+  public String getBusinessProcessInstanceId() {
     return businessProcessInstanceId;
   }
 
-  public void setBusinessProcessInstanceId(UUID businessProcessInstanceId) {
+  public void setBusinessProcessInstanceId(String businessProcessInstanceId) {
     this.businessProcessInstanceId = businessProcessInstanceId;
   }
 

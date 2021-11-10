@@ -32,7 +32,7 @@ CREATE TABLE pd_processing_consent_hst
     ddm_application_id uuid,
     ddm_business_process_id uuid,
     ddm_business_process_definition_id text,
-    ddm_business_process_instance_id uuid,
+    ddm_business_process_instance_id text,
     ddm_business_activity text,
     ddm_business_activity_instance_id text,
     ddm_digital_sign text,

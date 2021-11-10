@@ -95,7 +95,7 @@ public class HistoryTableSelectRepository {
     ddmInfo.setBusinessProcessDefinitionId(
         resultSet.getString(DDM_BUSINESS_PROCESS_DEFINITION_ID_COLUMN));
     ddmInfo.setBusinessProcessInstanceId(
-        resultSet.getObject(DDM_BUSINESS_PROCESS_INSTANCE_ID_COLUMN, UUID.class));
+        resultSet.getString(DDM_BUSINESS_PROCESS_INSTANCE_ID_COLUMN));
     ddmInfo.setBusinessActivity(resultSet.getString(DDM_BUSINESS_ACTIVITY_COLUMN));
     ddmInfo.setBusinessActivityInstanceId(
         resultSet.getString(DDM_BUSINESS_ACTIVITY_INSTANCE_ID_COLUMN));

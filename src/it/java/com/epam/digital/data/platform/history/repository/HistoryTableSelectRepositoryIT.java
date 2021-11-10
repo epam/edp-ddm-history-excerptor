@@ -90,7 +90,7 @@ class HistoryTableSelectRepositoryIT {
     ddmInfo.setApplicationId(UUID.fromString("04a00dc5-904d-4043-b8b0-aeb2d4c73ee2"));
     ddmInfo.setBusinessProcessId(UUID.fromString("b533ab28-4068-4e48-9115-e3a74fcfa243"));
     ddmInfo.setBusinessProcessDefinitionId("BP_DEF");
-    ddmInfo.setBusinessProcessInstanceId(UUID.fromString("d3d4db61-049c-4830-b77c-e8a7d2ebec89"));
+    ddmInfo.setBusinessProcessInstanceId("d3d4db61-049c-4830-b77c-e8a7d2ebec89");
     ddmInfo.setBusinessActivity("B_ACT");
     ddmInfo.setBusinessActivityInstanceId("B_ACT_INST_ID");
     ddmInfo.setDigitalSign("DIGN_SIGN");
