@@ -85,3 +85,4 @@ class HistoryExcerptorApplicationTest {
     verify(historyExcerptCreationService).createExcerpt(TABLE_NAME, UUID.fromString(ENTITY_ID));
   }
 }
+
