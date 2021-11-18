@@ -12,6 +12,7 @@ import com.epam.digital.data.platform.history.repository.DdmSourceApplicationRep
 import com.epam.digital.data.platform.history.repository.DdmSourceSystemRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class HistoryTableToExcerptConverter {
     var ddmApplicationsMap = getDdmApplicationsMap(tableRows);
     var ddmSystemsMap = getDdmSystemsMap(tableRows);
     var excerptRows =
-        historyTableData.getTableRows().stream()
+        tableRows.stream()
             .map(tableRow -> mapRow(tableRow, ddmApplicationsMap, ddmSystemsMap))
             .collect(Collectors.toList());
     return new HistoryExcerptData(historyTableData.getOperationalTableFields(), excerptRows);
@@ -53,10 +54,13 @@ public class HistoryTableToExcerptConverter {
             .map(HistoryTableRowDdmInfo::getApplicationId)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-    return ddmSourceApplicationRepository.findByApplicationIdIn(ddmApplicationIds).stream()
-        .collect(
-            Collectors.toMap(
-                DdmSourceApplication::getApplicationId, DdmSourceApplication::getApplicationName));
+    return ddmApplicationIds.isEmpty()
+        ? Collections.emptyMap()
+        : ddmSourceApplicationRepository.findByApplicationIdIn(ddmApplicationIds).stream()
+            .collect(
+                Collectors.toMap(
+                    DdmSourceApplication::getApplicationId,
+                    DdmSourceApplication::getApplicationName));
   }
 
   private Map<UUID, String> getDdmSystemsMap(List<HistoryTableRow> tableRows) {
@@ -66,8 +70,11 @@ public class HistoryTableToExcerptConverter {
             .map(HistoryTableRowDdmInfo::getSystemId)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-    return ddmSourceSystemRepository.findBySystemIdIn(ddmSystemIds).stream()
-        .collect(Collectors.toMap(DdmSourceSystem::getSystemId, DdmSourceSystem::getSystemName));
+    return ddmSystemIds.isEmpty()
+        ? Collections.emptyMap()
+        : ddmSourceSystemRepository.findBySystemIdIn(ddmSystemIds).stream()
+            .collect(
+                Collectors.toMap(DdmSourceSystem::getSystemId, DdmSourceSystem::getSystemName));
   }
 
   private HistoryExcerptRow mapRow(
