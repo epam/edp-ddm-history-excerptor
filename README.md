@@ -38,4 +38,4 @@ URL of generated excerpt can be found in correspondent K8s job metadata or, for 
 1. Run application with your favourite IDE or via `java -jar ...` with jar file, created above
 
 ### License
-report-publisher is Open Source software released under the Apache 2.0 license.
+history-excerptor is Open Source software released under the Apache 2.0 license.
