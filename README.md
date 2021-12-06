@@ -36,3 +36,6 @@ URL of generated excerpt can be found in correspondent K8s job metadata or, for 
 1. Add `--spring.profiles.active=local` to application run parameters
 1. Add mandatory arguments to application run parameters
 1. Run application with your favourite IDE or via `java -jar ...` with jar file, created above
+
+### License
+report-publisher is Open Source software released under the Apache 2.0 license.
