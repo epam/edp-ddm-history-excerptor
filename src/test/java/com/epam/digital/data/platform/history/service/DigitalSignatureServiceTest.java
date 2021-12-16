@@ -76,6 +76,6 @@ class DigitalSignatureServiceTest {
   void expectSignatureSavedWithCeph() {
     digitalSignatureService.saveSignature(DATA);
 
-    verify(requestSignatureCephService).putContent(eq(LOWCODE_BUCKET), any(), eq(DATA));
+    verify(requestSignatureCephService).put(eq(LOWCODE_BUCKET), any(), eq(DATA));
   }
 }

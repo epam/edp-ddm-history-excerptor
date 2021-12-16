@@ -69,13 +69,13 @@ class UserInfoRetrieveServiceTest {
     historyTableRowDdmInfo = new HistoryTableRowDdmInfo();
     historyTableRowDdmInfo.setDigitalSign(CEPH_KEY);
 
-    when(historicSignatureCephService.getContent(HISTORIC_BUCKET, CEPH_KEY))
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
         .thenReturn(Optional.of(CEPH_VALUE));
   }
 
   @Test
   void shouldEnrichWithEmptyUserInfoWhenThereIsNoFileInCephBucket() {
-    when(historicSignatureCephService.getContent(HISTORIC_BUCKET, CEPH_KEY))
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
         .thenReturn(Optional.empty());
     assertEmptyUserInfo();
   }

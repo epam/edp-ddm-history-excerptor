@@ -67,7 +67,7 @@ public class DigitalSignatureService {
     var key = UUID.randomUUID().toString();
     log.info("Storing to ceph");
     log.debug("Generated ceph key: {}", key);
-    requestSignatureCephService.putContent(requestSignatureBucket, key, value);
+    requestSignatureCephService.put(requestSignatureBucket, key, value);
     return key;
   }
 }

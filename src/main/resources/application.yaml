@@ -34,6 +34,13 @@ historic-signature-ceph:
   access-key: ${HISTORIC_SIGNATURES_CEPH_ACCESS_KEY}
   secret-key: ${HISTORIC_SIGNATURES_CEPH_SECRET_KEY}
 
+s3:
+  config:
+    client:
+      protocol: http
+    options:
+      pathStyleAccess: true
+
 openshift:
   enabled: true
   namespace: ${OPENSHIFT_NAMESPACE}

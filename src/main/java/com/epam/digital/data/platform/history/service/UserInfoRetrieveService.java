@@ -22,9 +22,9 @@ import com.epam.digital.data.platform.dso.client.DigitalSignatureRestClient;
 import com.epam.digital.data.platform.dso.client.exception.BadRequestException;
 import com.epam.digital.data.platform.dso.client.exception.InternalServerErrorException;
 import com.epam.digital.data.platform.dso.client.exception.SignatureValidationException;
+import com.epam.digital.data.platform.history.model.FormDataDto;
 import com.epam.digital.data.platform.history.model.HistoryTableRowDdmInfo;
 import com.epam.digital.data.platform.history.model.UserInfo;
-import com.epam.digital.data.platform.integration.ceph.dto.FormDataDto;
 import com.epam.digital.data.platform.integration.ceph.service.CephService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,7 +63,7 @@ public class UserInfoRetrieveService {
       log.error("Signature not saved. Key == null");
       return EMPTY_USER_INFO;
     }
-    var content = historicSignatureCephService.getContent(historicSignatureBucket, key);
+    var content = historicSignatureCephService.getAsString(historicSignatureBucket, key);
     if (content.isEmpty()) {
       log.error("Signature not found for key {}", key);
       return EMPTY_USER_INFO;
