@@ -17,6 +17,7 @@
 package com.epam.digital.data.platform.history.service;
 
 import com.epam.digital.data.platform.history.config.properties.OpenshiftProperties;
+import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.stereotype.Component;
 
@@ -40,14 +41,14 @@ public class OpenShiftService {
       try {
         kubernetesClient = kubernetesClientFactory.get();
         kubernetesClient
-                .batch()
+                .batch().v1()
                 .jobs()
                 .withName(openshiftProperties.getParentJob().getName())
-                .edit()
-                .editMetadata()
-                .addToAnnotations(openshiftProperties.getParentJob().getResultField(), result)
-                .endMetadata()
-                .done();
+                .edit(n -> new JobBuilder(n)
+                    .editMetadata()
+                      .addToAnnotations(openshiftProperties.getParentJob().getResultField(), result)
+                    .endMetadata()
+                    .build());
       } finally {
         if (kubernetesClient != null) {
           kubernetesClient.close();
