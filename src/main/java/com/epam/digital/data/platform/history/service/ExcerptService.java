@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -42,9 +43,11 @@ public class ExcerptService {
   private final ExcerptRestClient excerptRestClient;
   private final DigitalSignatureService digitalSignatureService;
   private final ThreadSleepService threadSleepService;
+  private final boolean signatureEnabled;
 
   public ExcerptService(
       @Value("${excerpt.statusCheck.maxAttempts}") int excerptStatusCheckMaxAttempts,
+      @Value("${signature.enabled}") boolean signatureEnabled,
       ExcerptRestClient excerptRestClient,
       DigitalSignatureService digitalSignatureService,
       ThreadSleepService threadSleepService) {
@@ -52,16 +55,15 @@ public class ExcerptService {
     this.excerptRestClient = excerptRestClient;
     this.digitalSignatureService = digitalSignatureService;
     this.threadSleepService = threadSleepService;
+    this.signatureEnabled = signatureEnabled;
   }
 
   public UUID generate(ExcerptEventDto excerptEventDto) {
-    var derivedSignature = digitalSignatureService.sign(excerptEventDto);
-    var derivedSignatureCephKey = digitalSignatureService.saveSignature(derivedSignature);
-    Map<String, Object> excerptGenerateHeaders =
-            createExcerptRequestHeaders(derivedSignatureCephKey);
+    Map<String, Object> excerptSignatureHeaders =
+            createExcerptSignatureHeaders(excerptEventDto);
     log.info("Calling excerpt generation");
     var excerptId =
-        excerptRestClient.generate(excerptEventDto, excerptGenerateHeaders).getExcerptIdentifier();
+            excerptRestClient.generate(excerptEventDto, excerptSignatureHeaders).getExcerptIdentifier();
     log.debug("Excerpt id: {}", excerptId);
     return excerptId;
   }
@@ -81,12 +83,17 @@ public class ExcerptService {
                 excerptStatusCheckMaxAttempts));
   }
 
-  private Map<String, Object> createExcerptRequestHeaders(String derivedSignatureCephKey) {
+  private Map<String, Object> createExcerptSignatureHeaders(ExcerptEventDto excerptEventDto) {
+    if (!signatureEnabled) {
+      return Collections.emptyMap();
+    }
+    var derivedSignature = digitalSignatureService.sign(excerptEventDto);
+    var derivedSignatureCephKey = digitalSignatureService.saveSignature(derivedSignature);
     Map<String, Object> excerptGenerateHeaders = new HashMap<>();
     excerptGenerateHeaders.put(
-        ThirdPartyHeader.X_DIGITAL_SIGNATURE.getHeaderName(), derivedSignatureCephKey);
+            ThirdPartyHeader.X_DIGITAL_SIGNATURE.getHeaderName(), derivedSignatureCephKey);
     excerptGenerateHeaders.put(
-        ThirdPartyHeader.X_DIGITAL_SIGNATURE_DERIVED.getHeaderName(), derivedSignatureCephKey);
+            ThirdPartyHeader.X_DIGITAL_SIGNATURE_DERIVED.getHeaderName(), derivedSignatureCephKey);
     return excerptGenerateHeaders;
   }
 

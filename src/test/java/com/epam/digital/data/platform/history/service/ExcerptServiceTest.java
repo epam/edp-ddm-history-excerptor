@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +67,7 @@ class ExcerptServiceTest {
     excerptService =
         new ExcerptService(
             EXCERPT_STATUS_CHECK_MAX_ATTEMPTS,
+            true,
             excerptRestClient,
             digitalSignatureService,
             threadSleepService);
@@ -82,11 +84,34 @@ class ExcerptServiceTest {
     var actual = excerptService.generate(eventDto);
 
     verify(excerptRestClient).generate(eq(eventDto), requestHeadersCaptor.capture());
-    var actualHeaders = (Map<String, Object>) requestHeadersCaptor.getValue();
+    var actualHeaders = requestHeadersCaptor.getValue();
     assertThat(actualHeaders)
         .hasSize(2)
         .containsEntry(ThirdPartyHeader.X_DIGITAL_SIGNATURE.getHeaderName(), CEPH_KEY)
         .containsEntry(ThirdPartyHeader.X_DIGITAL_SIGNATURE_DERIVED.getHeaderName(), CEPH_KEY);
+
+    assertThat(actual).isEqualTo(EXCERPT_ID);
+  }
+
+  @Test
+  void expectExcerptCallWithoutSignHeadersIfDisabled() {
+    excerptService =
+            new ExcerptService(
+                    EXCERPT_STATUS_CHECK_MAX_ATTEMPTS,
+                    false,
+                    excerptRestClient,
+                    digitalSignatureService,
+                    threadSleepService);
+    when(excerptRestClient.generate(any(), any())).thenReturn(new ExcerptEntityId(EXCERPT_ID));
+
+    var eventDto = new ExcerptEventDto();
+
+    var actual = excerptService.generate(eventDto);
+
+    verifyNoInteractions(digitalSignatureService);
+    verify(excerptRestClient).generate(eq(eventDto), requestHeadersCaptor.capture());
+    var actualHeaders = requestHeadersCaptor.getValue();
+    assertThat(actualHeaders).isEmpty();
 
     assertThat(actual).isEqualTo(EXCERPT_ID);
   }

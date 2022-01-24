@@ -7,6 +7,9 @@ spring:
 schema:
   name: public
 
+signature:
+  enabled: false
+
 thirdPartySystems:
   accessToken: token
 

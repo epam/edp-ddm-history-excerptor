@@ -11,6 +11,9 @@ schema:
   name: ${DB_SCHEMA:registry}
   historyTableSuffix: _hst
 
+signature:
+  enabled: true
+
 thirdPartySystems:
   accessToken: ${ACCESS_TOKEN}
 

@@ -63,14 +63,11 @@ class UserInfoRetrieveServiceTest {
 
   @BeforeEach
   void beforeEach() {
-    userInfoRetrieveService = new UserInfoRetrieveService(HISTORIC_BUCKET, OBJECT_MAPPER,
+    userInfoRetrieveService = new UserInfoRetrieveService(HISTORIC_BUCKET, true, OBJECT_MAPPER,
         digitalSignatureRestClient, historicSignatureCephService);
 
     historyTableRowDdmInfo = new HistoryTableRowDdmInfo();
     historyTableRowDdmInfo.setDigitalSign(CEPH_KEY);
-
-    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
-        .thenReturn(Optional.of(CEPH_VALUE));
   }
 
   @Test
@@ -82,11 +79,15 @@ class UserInfoRetrieveServiceTest {
 
   @Test
   void shouldEnrichWithEmptyUserInfoWhenInvalidSignature() {
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
+            .thenReturn(Optional.of(CEPH_VALUE));
     assertEmptyUserInfo();
   }
 
   @Test
   void shouldEnrichWithCorrectUserInfo() {
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
+            .thenReturn(Optional.of(CEPH_VALUE));
     when(digitalSignatureRestClient.getOwnerInfinite(new VerificationRequestDto(SIGNATURE, DATA)))
         .thenReturn(new OwnerResponseDto("name", "drfo", "edrpou"));
 
@@ -96,7 +97,16 @@ class UserInfoRetrieveServiceTest {
   }
 
   @Test
+  void shouldReturnEmptyUserInfoWhenSignatureDisabled() {
+    userInfoRetrieveService = new UserInfoRetrieveService(HISTORIC_BUCKET, false, OBJECT_MAPPER,
+            digitalSignatureRestClient, historicSignatureCephService);
+    assertEmptyUserInfo();
+  }
+
+  @Test
   void shouldReturnEmptyUserInfoWhenBadRequestException() {
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
+            .thenReturn(Optional.of(CEPH_VALUE));
     when(digitalSignatureRestClient.getOwnerInfinite(any()))
         .thenThrow(new BadRequestException(ERROR_DTO));
     assertEmptyUserInfo();
@@ -104,6 +114,8 @@ class UserInfoRetrieveServiceTest {
 
   @Test
   void shouldReturnEmptyUserInfoWhenInternalServerErrorException() {
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
+            .thenReturn(Optional.of(CEPH_VALUE));
     when(digitalSignatureRestClient.getOwnerInfinite(any()))
         .thenThrow(new InternalServerErrorException(ERROR_DTO));
     assertEmptyUserInfo();
@@ -111,6 +123,8 @@ class UserInfoRetrieveServiceTest {
 
   @Test
   void shouldReturnEmptyUserInfoWhenSignatureValidationException() {
+    when(historicSignatureCephService.getAsString(HISTORIC_BUCKET, CEPH_KEY))
+            .thenReturn(Optional.of(CEPH_VALUE));
     when(digitalSignatureRestClient.getOwnerInfinite(any()))
         .thenThrow(new SignatureValidationException(ERROR_DTO));
     assertEmptyUserInfo();

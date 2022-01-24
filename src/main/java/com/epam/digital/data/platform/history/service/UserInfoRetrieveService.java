@@ -42,22 +42,29 @@ public class UserInfoRetrieveService {
   private final Logger log = LoggerFactory.getLogger(UserInfoRetrieveService.class);
 
   private final String historicSignatureBucket;
+  private final boolean signatureEnabled;
   private final ObjectMapper objectMapper;
   private final DigitalSignatureRestClient digitalSignatureRestClient;
   private final CephService historicSignatureCephService;
 
   public UserInfoRetrieveService(
       @Value("${historic-signature-ceph.bucket}") String historicSignatureBucket,
+      @Value("${signature.enabled}") boolean signatureEnabled,
       ObjectMapper objectMapper,
       DigitalSignatureRestClient digitalSignatureRestClient,
       CephService historicSignatureCephService) {
     this.historicSignatureBucket = historicSignatureBucket;
+    this.signatureEnabled = signatureEnabled;
     this.objectMapper = objectMapper;
     this.digitalSignatureRestClient = digitalSignatureRestClient;
     this.historicSignatureCephService = historicSignatureCephService;
   }
 
   public UserInfo getUserInfo(HistoryTableRowDdmInfo tableDdmInfo) {
+    if (!signatureEnabled) {
+      log.info("Signature processing is disabled");
+      return EMPTY_USER_INFO;
+    }
     var key = tableDdmInfo.getDigitalSign();
     if (key == null) {
       log.error("Signature not saved. Key == null");
